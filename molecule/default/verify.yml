@@ -1,0 +1,23 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert that Nginx is running
+      ansible.builtin.assert:
+        that:
+          - "'nginx.service' in ansible_facts.services"
+          - "ansible_facts.services['nginx.service'].state == 'running'"
+        fail_msg: "Nginx is not running"
+
+    - name: Check if Lighthouse responds on port 80
+      ansible.builtin.uri:
+        url: "http://localhost"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 5
+      delay: 2

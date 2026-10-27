@@ -1,0 +1,11 @@
+---
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Disable systemd-tmpfiles-clean service to prevent /tmp cleanup
+      ansible.builtin.systemd:
+        name: systemd-tmpfiles-clean.timer
+        state: stopped
+        enabled: false
+      failed_when: false
